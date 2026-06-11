@@ -1,0 +1,290 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2222222222222222222222B1 /* BlindedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A1 /* BlindedApp.swift */; };
+		2222222222222222222222B2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A2 /* AppState.swift */; };
+		2222222222222222222222B3 /* DisplayEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A3 /* DisplayEngine.swift */; };
+		2222222222222222222222B4 /* LuminanceSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A4 /* LuminanceSampler.swift */; };
+		2222222222222222222222B5 /* LuminanceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A5 /* LuminanceCalculator.swift */; };
+		2222222222222222222222B6 /* BrightnessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A6 /* BrightnessController.swift */; };
+		2222222222222222222222B7 /* BrightnessMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A7 /* BrightnessMapper.swift */; };
+		2222222222222222222222B8 /* AdaptiveBrightnessModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A8 /* AdaptiveBrightnessModel.swift */; };
+		2222222222222222222222B9 /* LuminanceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A9 /* LuminanceStabilizer.swift */; };
+		2222222222222222222222BA /* Arm64DDC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AA /* Arm64DDC.swift */; };
+		2222222222222222222222BB /* BrightnessBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AB /* BrightnessBackend.swift */; };
+		2222222222222222222222BC /* ExternalDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AC /* ExternalDisplayManager.swift */; };
+		2222222222222222222222BD /* DisplayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AE /* DisplayCoordinator.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1111111111111111111111A1 /* BlindedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlindedApp.swift; sourceTree = "<group>"; };
+		1111111111111111111111A2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		1111111111111111111111A3 /* DisplayEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayEngine.swift; sourceTree = "<group>"; };
+		1111111111111111111111A4 /* LuminanceSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuminanceSampler.swift; sourceTree = "<group>"; };
+		1111111111111111111111A5 /* LuminanceCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuminanceCalculator.swift; sourceTree = "<group>"; };
+		1111111111111111111111A6 /* BrightnessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessController.swift; sourceTree = "<group>"; };
+		1111111111111111111111A7 /* BrightnessMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessMapper.swift; sourceTree = "<group>"; };
+		1111111111111111111111A8 /* AdaptiveBrightnessModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveBrightnessModel.swift; sourceTree = "<group>"; };
+		1111111111111111111111A9 /* LuminanceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuminanceStabilizer.swift; sourceTree = "<group>"; };
+		1111111111111111111111AA /* Arm64DDC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vendor/MonitorControl/Arm64DDC.swift; sourceTree = "<group>"; };
+		1111111111111111111111AB /* BrightnessBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessBackend.swift; sourceTree = "<group>"; };
+		1111111111111111111111AC /* ExternalDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayManager.swift; sourceTree = "<group>"; };
+		1111111111111111111111AE /* DisplayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCoordinator.swift; sourceTree = "<group>"; };
+		1111111111111111111111AD /* Blinded-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Blinded-Bridging-Header.h"; sourceTree = "<group>"; };
+		3333333333333333333333C1 /* Blinded.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinded.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6666666666666666666666F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4444444444444444444444D1 = {
+			isa = PBXGroup;
+			children = (
+				4444444444444444444444D2 /* Blinded */,
+				4444444444444444444444D3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4444444444444444444444D2 /* Blinded */ = {
+			isa = PBXGroup;
+			children = (
+				1111111111111111111111A1 /* BlindedApp.swift */,
+				1111111111111111111111A2 /* AppState.swift */,
+				1111111111111111111111A3 /* DisplayEngine.swift */,
+				1111111111111111111111A4 /* LuminanceSampler.swift */,
+				1111111111111111111111A5 /* LuminanceCalculator.swift */,
+				1111111111111111111111A6 /* BrightnessController.swift */,
+				1111111111111111111111A7 /* BrightnessMapper.swift */,
+				1111111111111111111111A8 /* AdaptiveBrightnessModel.swift */,
+				1111111111111111111111A9 /* LuminanceStabilizer.swift */,
+				1111111111111111111111AB /* BrightnessBackend.swift */,
+				1111111111111111111111AC /* ExternalDisplayManager.swift */,
+				1111111111111111111111AE /* DisplayCoordinator.swift */,
+				1111111111111111111111AA /* Arm64DDC.swift */,
+				1111111111111111111111AD /* Blinded-Bridging-Header.h */,
+			);
+			path = Blinded;
+			sourceTree = "<group>";
+		};
+		4444444444444444444444D3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3333333333333333333333C1 /* Blinded.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5555555555555555555555E1 /* Blinded */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Blinded" */;
+			buildPhases = (
+				6666666666666666666666F1 /* Sources */,
+				6666666666666666666666F2 /* Frameworks */,
+				6666666666666666666666F3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Blinded;
+			productName = Blinded;
+			productReference = 3333333333333333333333C1 /* Blinded.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7777777777777777777777A0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 1700;
+				TargetAttributes = {
+					5555555555555555555555E1 = {
+						CreatedOnToolsVersion = 17.0;
+					};
+				};
+			};
+			buildConfigurationList = 8888888888888888888888A0 /* Build configuration list for PBXProject "Blinded" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4444444444444444444444D1;
+			productRefGroup = 4444444444444444444444D3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5555555555555555555555E1 /* Blinded */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6666666666666666666666F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6666666666666666666666F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2222222222222222222222B1 /* BlindedApp.swift in Sources */,
+				2222222222222222222222B2 /* AppState.swift in Sources */,
+				2222222222222222222222B3 /* DisplayEngine.swift in Sources */,
+				2222222222222222222222B4 /* LuminanceSampler.swift in Sources */,
+				2222222222222222222222B5 /* LuminanceCalculator.swift in Sources */,
+				2222222222222222222222B6 /* BrightnessController.swift in Sources */,
+				2222222222222222222222B7 /* BrightnessMapper.swift in Sources */,
+				2222222222222222222222B8 /* AdaptiveBrightnessModel.swift in Sources */,
+				2222222222222222222222B9 /* LuminanceStabilizer.swift in Sources */,
+				2222222222222222222222BA /* Arm64DDC.swift in Sources */,
+				2222222222222222222222BB /* BrightnessBackend.swift in Sources */,
+				2222222222222222222222BC /* ExternalDisplayManager.swift in Sources */,
+				2222222222222222222222BD /* DisplayCoordinator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9999999999999999999999A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9999999999999999999999A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		9999999999999999999999A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 36WA9JF942;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Blinded;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MARKETING_VERSION = 0.1;
+				CURRENT_PROJECT_VERSION = 1;
+				SWIFT_OBJC_BRIDGING_HEADER = "Blinded/Blinded-Bridging-Header.h";
+				OTHER_LDFLAGS = "-framework CoreDisplay";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Blinded;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9999999999999999999999A3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 36WA9JF942;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Blinded;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MARKETING_VERSION = 0.1;
+				CURRENT_PROJECT_VERSION = 1;
+				SWIFT_OBJC_BRIDGING_HEADER = "Blinded/Blinded-Bridging-Header.h";
+				OTHER_LDFLAGS = "-framework CoreDisplay";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Blinded;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8888888888888888888888A0 /* Build configuration list for PBXProject "Blinded" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9999999999999999999999A0 /* Debug */,
+				9999999999999999999999A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Blinded" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9999999999999999999999A2 /* Debug */,
+				9999999999999999999999A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7777777777777777777777A0 /* Project object */;
+}
