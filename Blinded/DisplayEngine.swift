@@ -17,7 +17,7 @@ final class DisplayEngine {
     // Reaction tuning.
     var jumpThreshold: Double = 0.15
     var fastRampPerSecond: Double = 6.0     // big brightening (dark content) — kept gentle to avoid a flash
-    var dimRampPerSecond: Double = 18.0     // big dimming (content got brighter) — snappy to kill the flare
+    var dimRampPerSecond: Double = 50.0     // big dimming (content got brighter) — ~instant (one frame)
     var gentleRampPerSecond: Double = 2.0
     var settleTime: CFTimeInterval = 0.0 {
         didSet { stabilizer.settleTime = settleTime }

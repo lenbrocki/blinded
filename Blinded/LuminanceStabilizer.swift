@@ -10,6 +10,7 @@ struct LuminanceStabilizer {
     var settleTime: CFTimeInterval = 0.0   // how long a value must hold to be accepted (0 = off)
     var settleBand: Double = 0.03          // "still moving" if consecutive readings differ by more
     var noiseBand: Double = 0.015          // ignore differences from committed below this
+    var jumpCommit: Double = 0.18          // a change this large commits immediately (no settle wait)
 
     private(set) var committed: Double
     private var pending: Double?
@@ -25,6 +26,12 @@ struct LuminanceStabilizer {
         if abs(luminance - committed) <= noiseBand {
             pending = nil
             return false
+        }
+        // A large, decisive jump (e.g. switching to a white page) commits on the first frame.
+        if abs(luminance - committed) >= jumpCommit {
+            committed = luminance
+            pending = nil
+            return true
         }
         if let pending, abs(luminance - pending) <= settleBand {
             if now - pendingSince >= settleTime {
