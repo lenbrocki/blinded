@@ -33,6 +33,9 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
     static func requestPermission() -> Bool { CGRequestScreenCaptureAccess() }
 
     func start() async throws {
+        // Tear down any prior (possibly dead) stream so this is safe to call for recovery.
+        if stream != nil { await stop() }
+
         let content = try await SCShareableContent.excludingDesktopWindows(
             false, onScreenWindowsOnly: false
         )
@@ -46,7 +49,7 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
         let config = SCStreamConfiguration()
         config.width = 64
         config.height = 40
-        config.minimumFrameInterval = CMTime(value: 1, timescale: 30)
+        config.minimumFrameInterval = CMTime(value: 1, timescale: 60)
         config.queueDepth = 3
         config.pixelFormat = kCVPixelFormatType_32BGRA
         config.showsCursor = false

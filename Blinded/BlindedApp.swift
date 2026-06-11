@@ -25,7 +25,7 @@ struct ContentView: View {
             .toggleStyle(.switch)
             .font(.headline)
 
-            if !state.hasScreenPermission {
+            if !state.hasScreenPermission || state.captureBlocked {
                 permissionRow
             }
             if !state.builtInBrightnessAvailable {
@@ -43,9 +43,6 @@ struct ContentView: View {
                 }
             }
 
-            Divider()
-            settleTimePicker
-
             if let error = state.lastErrorMessage {
                 Text(error).font(.caption).foregroundStyle(.red)
             }
@@ -60,29 +57,19 @@ struct ContentView: View {
 
     private var permissionRow: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Label("Screen Recording permission needed", systemImage: "lock")
+            Label(state.captureBlocked
+                  ? "No screen frames — Screen Recording blocked"
+                  : "Screen Recording permission needed",
+                  systemImage: "lock")
                 .foregroundStyle(.orange)
+            if state.captureBlocked {
+                Text("macOS may have revoked it. Enable Blinded under Screen Recording, then toggle Auto-brightness off and on.")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
             Button("Open Screen Recording settings…") { state.openScreenRecordingSettings() }
         }
     }
 
-    private var settleTimePicker: some View {
-        HStack {
-            Text("Settle time").foregroundStyle(.secondary)
-            Spacer()
-            Picker("", selection: Binding(
-                get: { Int((state.settleTime * 1000).rounded()) },
-                set: { state.settleTime = Double($0) / 1000 }
-            )) {
-                ForEach(AppState.settleTimeOptionsMs, id: \.self) { ms in
-                    Text(ms == 0 ? "off" : "\(ms) ms").tag(ms)
-                }
-            }
-            .pickerStyle(.menu)
-            .labelsHidden()
-            .fixedSize()
-        }
-    }
 }
 
 struct DisplayRow: View {

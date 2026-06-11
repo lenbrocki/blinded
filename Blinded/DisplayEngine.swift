@@ -16,9 +16,10 @@ final class DisplayEngine {
 
     // Reaction tuning.
     var jumpThreshold: Double = 0.15
-    var fastRampPerSecond: Double = 6.0
+    var fastRampPerSecond: Double = 6.0     // big brightening (dark content) — kept gentle to avoid a flash
+    var dimRampPerSecond: Double = 18.0     // big dimming (content got brighter) — snappy to kill the flare
     var gentleRampPerSecond: Double = 2.0
-    var settleTime: CFTimeInterval = 0.05 {
+    var settleTime: CFTimeInterval = 0.0 {
         didSet { stabilizer.settleTime = settleTime }
     }
 
@@ -48,6 +49,11 @@ final class DisplayEngine {
     private var pendingOverride: Double?
     private var pendingOverrideSince: CFTimeInterval = 0
     private var isUserEditing = false
+
+    // Capture recovery.
+    private var isLaunching = false
+    private var captureRetry = 0
+    private let maxCaptureRetries = 12
 
     private(set) var isRunning = false
 
@@ -79,26 +85,62 @@ final class DisplayEngine {
             DispatchQueue.main.async { self?.ingest(luminance: lum) }
         }
         sampler.onError = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.isRunning = false
-                self?.onError?(error)
-            }
+            // Stream stopped (display sleep, resolution change, etc.) — recover, don't give up.
+            DispatchQueue.main.async { self?.handleCaptureStopped(error) }
         }
 
         if backend.supportsReadback {
             startMonitor()
         }
 
+        launchCapture()
+    }
+
+    // MARK: - Capture lifecycle / recovery
+
+    /// Re-establishes capture after a sleep/wake or display reconfiguration. Resets the retry
+    /// budget so a long-asleep display reconnects cleanly.
+    func restartCapture() {
+        guard isRunning else { start(); return }
+        captureRetry = 0
+        launchCapture()
+    }
+
+    private func launchCapture() {
+        guard isRunning, !isLaunching else { return }
+        isLaunching = true
         Task { [weak self] in
             guard let self else { return }
             do {
                 try await self.sampler.start()
+                await MainActor.run { self.isLaunching = false }
             } catch {
                 await MainActor.run {
-                    self.isRunning = false
-                    self.onError?(error)
+                    self.isLaunching = false
+                    self.scheduleCaptureRetry(error)
                 }
             }
+        }
+    }
+
+    private func handleCaptureStopped(_ error: Error) {
+        guard isRunning else { return }
+        scheduleCaptureRetry(error)
+    }
+
+    /// During wake, displays are briefly unavailable (`SCShareableContent` returns none). Retry
+    /// with backoff; only surface an error after many failures (e.g. permission truly revoked).
+    private func scheduleCaptureRetry(_ error: Error) {
+        guard isRunning else { return }
+        guard captureRetry < maxCaptureRetries else {
+            onError?(error)
+            return
+        }
+        captureRetry += 1
+        let delay = min(0.5 * Double(captureRetry), 3.0)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, self.isRunning else { return }
+            self.launchCapture()
         }
     }
 
@@ -148,6 +190,7 @@ final class DisplayEngine {
     // MARK: - Control loop (main thread)
 
     private func ingest(luminance lum: Double) {
+        captureRetry = 0 // frames are flowing again
         latestLuminance = lum
         ensureControlTimer()
     }
@@ -169,8 +212,14 @@ final class DisplayEngine {
 
         if stabilizer.update(luminance: latestLuminance, now: now) {
             let newTarget = model.brightness(forLuminance: stabilizer.committed)
-            rampPerSecond = abs(newTarget - currentBrightness) >= jumpThreshold
-                ? fastRampPerSecond : gentleRampPerSecond
+            let delta = newTarget - currentBrightness
+            if abs(delta) >= jumpThreshold {
+                // Dimming (content got brighter) is sped up to minimize the brightness flare;
+                // brightening stays gentler so it doesn't flash.
+                rampPerSecond = delta < 0 ? dimRampPerSecond : fastRampPerSecond
+            } else {
+                rampPerSecond = gentleRampPerSecond
+            }
             targetBrightness = newTarget
         }
 

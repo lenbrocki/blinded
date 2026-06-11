@@ -1,81 +1,99 @@
+<div align="center">
+
 # Blinded
 
-A macOS menu bar app that **automatically adjusts the built-in display brightness based on
-on-screen content**. Dark content (IDEs, terminals) → screen gets brighter; bright content
-(browsers, email with lots of white) → screen dims. The goal is steady *perceived* brightness
-and less eye strain as you switch apps.
+### Adaptive screen brightness for macOS that follows your content — and learns from you.
 
-Works on the built-in panel **and external monitors**, each adapted to its own content and its
-own learned curve. Menu-bar-only UI. Apple Silicon, macOS 14+.
+Blinded watches what's on your screen and keeps its **perceived** brightness steady: it dims
+for bright pages and brightens for dark editors, so your eyes aren't constantly readjusting.
+Set the brightness yourself once and it **remembers what you wanted** — across your built-in
+display *and* every external monitor.
+
+**Apple Silicon · macOS 14+ · lives in the menu bar**
+
+</div>
+
+---
+
+## ✨ Features
+
+- **🌗 Content-aware** — bright, white-heavy windows dim the backlight; dark IDEs and terminals
+  brighten it. The goal is constant *perceived* brightness and less eye strain.
+- **🧠 Learns your preference** — whenever you adjust brightness yourself, Blinded records what
+  you wanted for that kind of content and adapts its curve. The more you use it, the more it
+  feels like yours.
+- **🖥️ Built-in *and* external monitors** — controls your MacBook panel and external displays
+  over DDC/CI, each adapted to its own content and with its own learned memory. Plug or unplug a
+  monitor and it adjusts automatically.
+- **⚡ Instant and quiet** — reacts the moment your content changes, and uses ~no CPU when the
+  screen is still.
+- **🪶 Out of the way** — a single menu-bar icon, no Dock clutter, no window to manage.
+- **🔒 Private** — everything happens locally on your Mac; nothing is sent anywhere.
 
 ## Install
 
-1. Download `Blinded.dmg` from the [latest release](../../releases/latest).
-2. Open it and drag **Blinded** to Applications, then launch it.
-3. Grant **Screen Recording** when prompted (System Settings → Privacy & Security → Screen
-   Recording), and relaunch.
-4. In System Settings → Displays, turn **off "Automatically adjust brightness"** so Blinded is
-   the sole controller.
+1. Download **`Blinded.dmg`** from the [latest release](../../releases/latest).
+2. Open it and drag **Blinded** into **Applications**.
+3. Launch Blinded — a sun icon appears in your menu bar.
 
-Released builds are signed with a Developer ID and notarized, so they open without Gatekeeper
-warnings.
+> Releases are signed with a Developer ID and notarized by Apple, so they open without security
+> warnings.
 
-## How it works
+## Getting started
 
-- **Per display:** one capture stream + adaptive engine + learned curve per display (built-in and
-  every DDC-capable external), rebuilt automatically when you plug/unplug a monitor.
+1. Click the menu-bar icon and turn on **Auto-brightness**.
+2. Grant **Screen Recording** when macOS asks (System Settings → Privacy & Security → Screen
+   Recording → enable **Blinded**), then relaunch the app. *Blinded reads your screen only to
+   measure how bright the content is — never its contents.*
+3. In **System Settings → Displays**, turn **off “Automatically adjust brightness”** so Blinded
+   is the only thing controlling your backlight.
 
-- **Sensing (event-driven):** a low-res ([ScreenCaptureKit](https://developer.apple.com/documentation/screencapturekit))
-  stream of the main display (64×40 px). ScreenCaptureKit is push-based — it delivers a frame
-  only when the screen content changes — so reactions are near-instant and a static screen costs
-  ~0 CPU. Each frame's average perceptual luminance is computed.
-- **Mapping (learnable):** an `AdaptiveBrightnessModel` — control points across the luminance
-  range, linearly interpolated — turns luminance into a target backlight level. It cold-starts
-  from the fixed `BrightnessMapper` curve and is reshaped over time by the user's corrections.
-- **Actuation:** built-in panel via the private `DisplayServices.framework`
-  (`DisplayServicesSetBrightness`, `dlopen`/`dlsym`); external monitors via **DDC/CI** over I2C
-  using the vendored `Arm64DDC` from [MonitorControl](https://github.com/MonitorControl/MonitorControl)
-  (MIT). This is why the app is **not sandboxed** and cannot ship on the Mac App Store.
-- **External corrections:** macOS brightness keys don't drive DDC and DDC readback is unreliable,
-  so each external display has an in-app **slider** — adjusting it both sets the brightness and
-  teaches that display's curve.
-- **Smoothing:** large luminance jumps ramp fast (~0.15 s); small changes ramp gently to avoid
-  flicker. A short 60 Hz ramp timer runs only during a transition.
+That's it — switch between a dark editor and a bright browser and watch the brightness follow.
 
-## Verifying behavior
+## Teaching it your preference
 
-- Open a full-screen **dark** window (terminal/IDE) → the menu's "Content luminance" drops and
-  the backlight ramps **up** within a fraction of a second.
-- Open a full-screen **white** window (browser/email) → luminance rises, backlight ramps
-  **down**.
-- Scrolling/video should not cause flicker; a fully static screen produces no adjustments.
-- Toggle off → brightness stops changing and the app leaves manual changes alone.
+Each display has a brightness **slider** in the menu. Whenever the brightness isn't quite right:
 
-## Learning from your corrections
+- **Built-in display:** just use your keyboard's brightness keys as usual.
+- **External display:** drag its slider in the menu.
 
-The luminance→brightness curve adapts to you:
+Blinded treats that as *“for this kind of content, I want this brightness”* and reshapes that
+display's curve so similar content lands where you like it next time. Corrections are **local** —
+tuning bright pages doesn't affect how dark ones behave. Each display remembers separately, and
+its memory survives reconnects. A per-display reset button restores the default curve.
 
-1. When content changes, the app sets brightness from the current curve.
-2. If you then adjust brightness yourself (brightness keys, Control Center), the app stops
-   driving, waits for your value to settle (~0.4 s), and treats it as: *"at this content
-   luminance, I actually want this brightness."*
-3. It nudges the curve's control points near that luminance toward your chosen value (a
-   distance-weighted update), so future content with similar luminance lands closer to your
-   preference. Corrections are local — adjusting brightness for white content doesn't change
-   behavior for dark content.
+## How it works (in plain terms)
 
-Each display has its own learned curve saved to `~/Library/Application Support/Blinded/curve-<id>.json`
-(keyed by a stable display UUID, so it survives reconnects). Each display row shows a "learned"
-count and a reset button.
+Blinded takes a tiny, low-resolution snapshot of each screen *only when its content changes*,
+measures the average brightness, and maps that to a backlight level through a curve it keeps
+refining from your corrections. Transitions ramp smoothly so there's no flicker, and a static
+screen costs essentially nothing.
 
-## Tuning
+---
 
-- `Blinded/BrightnessMapper.swift` — `minBrightness`, `maxBrightness`, `gamma` (the default curve).
-- `Blinded/DisplayEngine.swift` — `jumpThreshold`, `fastRampPerSecond`, `gentleRampPerSecond`,
-  `overrideThreshold`, `overrideSettleTime` (reaction / learning).
-- `Blinded/LuminanceStabilizer.swift` — `settleTime` (transient rejection; also a menu control).
+## Under the hood
 
-## Build from source
+- **Per-display engine** — each display gets its own capture stream, brightness curve, and
+  control loop, created and torn down automatically on hotplug ([`DisplayCoordinator`](Blinded/DisplayCoordinator.swift),
+  [`DisplayEngine`](Blinded/DisplayEngine.swift)).
+- **Sensing** — an event-driven [ScreenCaptureKit](https://developer.apple.com/documentation/screencapturekit)
+  stream downscaled to ~64×40 px. It's push-based (frames arrive only on content change), so
+  reactions are near-instant and an idle screen is ~0 CPU. Average perceptual luminance is
+  computed per frame.
+- **Learnable mapping** — an [`AdaptiveBrightnessModel`](Blinded/AdaptiveBrightnessModel.swift)
+  of interpolated control points across the luminance range. It cold-starts from a fixed curve
+  and is reshaped by corrections via a local, distance-weighted update that keeps the curve
+  monotonic. Saved per display to `~/Library/Application Support/Blinded/curve-<id>.json`.
+- **Actuation** — built-in panel through the private `DisplayServices` framework
+  (`DisplayServicesSetBrightness`, resolved with `dlopen`/`dlsym`); external monitors through
+  **DDC/CI** over I2C using the vendored [`Arm64DDC`](Blinded/Vendor/MonitorControl/Arm64DDC.swift)
+  from MonitorControl. Because it uses private APIs it is **not sandboxed** and can't ship on the
+  Mac App Store.
+- **Smoothness** — a [`LuminanceStabilizer`](Blinded/LuminanceStabilizer.swift) ignores transient
+  luminance during window/space-swipe animations, and brightness ramps fast for big switches,
+  gently for small ones.
+
+### Build from source
 
 ```sh
 xcodebuild -project Blinded.xcodeproj -scheme Blinded -configuration Debug \
@@ -85,9 +103,9 @@ open build/Build/Products/Debug/Blinded.app
 
 Or open `Blinded.xcodeproj` in Xcode and Run.
 
-## Releasing (maintainer)
+### Releasing (maintainer)
 
-Tagging a `v*` version triggers [`.github/workflows/release.yml`](.github/workflows/release.yml),
+Pushing a `v*` tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml),
 which builds, Developer-ID-signs, **notarizes**, packages `Blinded.dmg`, and publishes a GitHub
 Release.
 
@@ -100,23 +118,33 @@ One-time repo **secrets** (Settings → Secrets and variables → Actions):
 
 | Secret | What it is |
 | --- | --- |
-| `MACOS_CERTIFICATE` | base64 of your exported *Developer ID Application* `.p12` (cert + private key): `base64 -i cert.p12 \| pbcopy` |
+| `MACOS_CERTIFICATE` | base64 of your exported *Developer ID Application* `.p12`: `base64 -i cert.p12 \| pbcopy` |
 | `MACOS_CERTIFICATE_PWD` | the password you set when exporting the `.p12` |
 | `KEYCHAIN_PASSWORD` | any string (temporary CI keychain) |
 | `APPLE_ID` | your Apple ID email |
 | `APPLE_TEAM_ID` | your 10-char Team ID |
 | `APPLE_APP_PASSWORD` | an app-specific password from appleid.apple.com (for notarytool) |
 
-## Notes
+### Tuning
 
-- `DisplayServicesSetBrightness` and the DDC `IOAVService*` symbols are private/undocumented APIs.
+- [`BrightnessMapper.swift`](Blinded/BrightnessMapper.swift) — `minBrightness`, `maxBrightness`,
+  `gamma` (the default curve).
+- [`DisplayEngine.swift`](Blinded/DisplayEngine.swift) — `jumpThreshold`, `fastRampPerSecond`,
+  `gentleRampPerSecond`, `overrideThreshold`, `overrideSettleTime` (reaction / learning).
+- [`LuminanceStabilizer.swift`](Blinded/LuminanceStabilizer.swift) — `settleTime` (transient
+  rejection; default `0` = off).
+
+### Limitations
+
+- `DisplayServicesSetBrightness` and the DDC `IOAVService*` symbols are private/undocumented.
   They work on current Apple Silicon Macs but are unsupported by Apple and could change.
-- External brightness uses DDC/CI; monitors connected through some USB-C hubs/docks don't support
-  it and won't appear as controllable.
-- The capture reads rendered pixels, not emitted light, so there is no feedback loop between the
-  backlight and the measured luminance.
+- External control needs DDC/CI; some displays — or connections through certain USB-C
+  hubs/docks — don't support it and won't appear as controllable.
+- Capture reads rendered pixels, not emitted light, so there's no feedback loop between the
+  backlight and the measurement.
 
-## Credits
+## Credits & license
 
-DDC/CI control on Apple Silicon (`Blinded/Vendor/MonitorControl/Arm64DDC.swift`) is vendored from
-[MonitorControl](https://github.com/MonitorControl/MonitorControl) (MIT).
+Blinded is released under the [MIT License](LICENSE). DDC/CI control on Apple Silicon
+([`Arm64DDC.swift`](Blinded/Vendor/MonitorControl/Arm64DDC.swift)) is vendored from
+[MonitorControl](https://github.com/MonitorControl/MonitorControl), also MIT.

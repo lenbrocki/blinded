@@ -7,7 +7,7 @@ import QuartzCore
 /// still animating, consecutive readings keep differing by more than `settleBand`, so nothing
 /// commits and the backlight does not chase the animation.
 struct LuminanceStabilizer {
-    var settleTime: CFTimeInterval = 0.05  // how long a value must hold to be accepted
+    var settleTime: CFTimeInterval = 0.0   // how long a value must hold to be accepted (0 = off)
     var settleBand: Double = 0.03          // "still moving" if consecutive readings differ by more
     var noiseBand: Double = 0.015          // ignore differences from committed below this
 

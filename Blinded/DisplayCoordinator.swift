@@ -19,7 +19,7 @@ final class DisplayCoordinator {
     private(set) var engines: [CGDirectDisplayID: DisplayEngine] = [:]
     private(set) var order: [CGDirectDisplayID] = []
 
-    var settleTime: CFTimeInterval = 0.05 {
+    var settleTime: CFTimeInterval = 0.0 {
         didSet { engines.values.forEach { $0.settleTime = settleTime } }
     }
 
@@ -125,16 +125,46 @@ final class DisplayCoordinator {
         return fallback
     }
 
-    // MARK: - Hotplug
+    // MARK: - Hotplug & sleep/wake recovery
 
     private func observeHotplug() {
         guard !observing else { return }
         observing = true
+
+        // Display add/remove/resolution change.
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
             object: nil, queue: .main
         ) { [weak self] _ in
-            self?.rebuild()
+            self?.handleDisplayChange()
         }
+
+        // System / display wake (lid open, sleep/wake): streams die while asleep, so re-establish.
+        let wsnc = NSWorkspace.shared.notificationCenter
+        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification] {
+            wsnc.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                self?.handleWake()
+            }
+        }
+    }
+
+    private func handleDisplayChange() {
+        guard isRunning else { return }
+        rebuild() // add new / remove gone displays
+        engines.values.forEach { $0.restartCapture() } // re-establish streams that may have dropped
+    }
+
+    private func handleWake() {
+        guard isRunning else { return }
+        // External DDC service handles (IOAVService) can go stale across a sleep where the display
+        // dropped, so drop external engines and let rebuild() recreate them with fresh services.
+        // The built-in's DisplayServices handle stays valid, so its engine is kept.
+        let externalIDs = engines.filter { !$0.value.info.isBuiltIn }.map(\.key)
+        for id in externalIDs {
+            engines[id]?.stop()
+            engines[id] = nil
+        }
+        rebuild() // recreates externals with fresh backends; adds/removes displays as needed
+        engines.values.forEach { $0.restartCapture() } // re-establish streams that died while asleep
     }
 }
