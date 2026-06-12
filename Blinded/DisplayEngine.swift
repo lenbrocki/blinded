@@ -327,8 +327,20 @@ final class DisplayEngine {
         }
     }
 
+    /// True only while the loop is genuinely driving the backlight toward a content target — the
+    /// control timer is live AND we're not parked. When auto-adjust is parked by a detected
+    /// override (`pendingOverride`) or an active slider edit, the loop isn't writing, so it must
+    /// NOT count as "ramping".
+    ///
+    /// Without the parked checks this deadlocks: the override poll skips ticks while "ramping", but
+    /// a parked loop never closes the target/current gap, so it looks like it's ramping forever —
+    /// the poll keeps skipping and the override never commits, so the park never lifts. That is
+    /// what stranded auto-adjust after sleep/wake: macOS nudges the backlight during the wake fade,
+    /// the poll reads it as an override and parks, and only a manual brightness change (which snaps
+    /// current==target) could break the cycle. Now the poll resolves it on its own.
     private var isActivelyRamping: Bool {
-        controlTimer != nil && abs(targetBrightness - currentBrightness) > 0.005
+        controlTimer != nil && !isUserAdjustingBrightness && !isUserEditing
+            && abs(targetBrightness - currentBrightness) > 0.005
     }
 
     /// True while the user is actively changing brightness (poll pending, or a notification

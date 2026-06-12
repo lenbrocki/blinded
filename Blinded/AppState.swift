@@ -127,7 +127,10 @@ final class AppState: ObservableObject {
     private func startCaptureWatchdog() {
         captureWatchdog?.invalidate()
         captureWatchdog = Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { [weak self] _ in
-            Task { @MainActor in self?.checkCaptureWatchdog() }
+            guard let self else { return }
+            Task { @MainActor in
+                self.checkCaptureWatchdog()
+            }
         }
     }
 
