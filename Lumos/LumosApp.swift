@@ -25,9 +25,6 @@ struct ContentView: View {
             .toggleStyle(.switch)
             .font(.headline)
 
-            if !state.hasScreenPermission || state.captureBlocked {
-                permissionRow
-            }
             if !state.builtInBrightnessAvailable {
                 Label("Brightness control unavailable", systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
@@ -58,21 +55,6 @@ struct ContentView: View {
         .frame(width: 320)
         .onAppear { state.popoverAppeared() }
         .onDisappear { state.popoverDisappeared() }
-    }
-
-    private var permissionRow: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Label(state.captureBlocked
-                  ? "No screen frames — Screen Recording blocked"
-                  : "Screen Recording permission needed",
-                  systemImage: "lock")
-                .foregroundStyle(.orange)
-            if state.captureBlocked {
-                Text("macOS may have revoked it. Enable Lumos under Screen Recording, then toggle Auto-brightness off and on.")
-                    .font(.caption2).foregroundStyle(.secondary)
-            }
-            Button("Open Screen Recording settings…") { state.openScreenRecordingSettings() }
-        }
     }
 
 }
