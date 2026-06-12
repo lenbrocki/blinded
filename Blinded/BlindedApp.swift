@@ -53,6 +53,8 @@ struct ContentView: View {
         }
         .padding(14)
         .frame(width: 320)
+        .onAppear { state.popoverAppeared() }
+        .onDisappear { state.popoverDisappeared() }
     }
 
     private var permissionRow: some View {
@@ -82,13 +84,6 @@ struct DisplayRow: View {
                 Image(systemName: display.isBuiltIn ? "laptopcomputer" : "display")
                 Text(display.name).fontWeight(.medium).lineLimit(1)
                 Spacer()
-                Button {
-                    state.resetLearning(display.id)
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                }
-                .buttonStyle(.borderless)
-                .help("Reset learned curve for this display")
             }
 
             HStack(spacing: 6) {
@@ -110,8 +105,6 @@ struct DisplayRow: View {
                 Text("luminance \(Int((display.luminance * 100).rounded()))%")
                 Spacer()
                 Text("brightness \(Int((display.brightness * 100).rounded()))%")
-                Spacer()
-                Text("learned \(display.corrections)")
             }
             .font(.caption2)
             .foregroundStyle(.secondary)

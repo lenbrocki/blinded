@@ -1,22 +1,31 @@
 import CoreGraphics
-import CoreImage
 import CoreMedia
+import CoreVideo
 import Foundation
 import ScreenCaptureKit
 
-/// Event-driven screen sampler built on ScreenCaptureKit. The stream is push-based:
-/// frames are delivered only when content changes (dirty-region tracking), so there is
-/// ~0 work on a static screen. Only `.complete` frames are forwarded.
+/// Screen sampler built on ScreenCaptureKit.
+///
+/// ScreenCaptureKit is NOT a pure "push on change" API: `SCStream` delivers buffers at up to
+/// `minimumFrameInterval`, and on a static screen those buffers still arrive carrying
+/// `SCFrameStatus.idle` ("new frame was not generated because the display did not change").
+/// So the capture rate is the idle-CPU floor — there is no setting for "zero delivery until
+/// something changes." We therefore capture at a low fixed rate: idle frames are cheap at this
+/// rate, and only `.complete` frames (real content changes) are forwarded for luminance work.
+///
+/// Trade-off: a low rate means a real change is noticed up to `1/captureFPS` seconds late.
 final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
     enum SamplerError: Error { case noDisplay }
 
-    /// Called on `sampleQueue` (a background queue) for each changed frame.
-    var onFrame: ((CGImage) -> Void)?
+    private static let captureFPS: Int32 = 5
+
+    /// Called on `sampleQueue` (a background queue) with the average luminance (0...1) of each
+    /// changed frame.
+    var onFrame: ((Double) -> Void)?
     /// Called when the stream stops with an error.
     var onError: ((Error) -> Void)?
 
     private var stream: SCStream?
-    private let ciContext = CIContext(options: [.priorityRequestLow: true])
     private let sampleQueue = DispatchQueue(label: "com.blinded.sampler", qos: .userInitiated)
 
     /// The display this sampler captures. Defaults to the main display.
@@ -45,11 +54,20 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
             throw SamplerError.noDisplay
         }
 
-        let filter = SCContentFilter(display: display, excludingWindows: [])
+        // Exclude our own windows (the menu-bar popover) from capture. Otherwise the popover —
+        // which shows live luminance/brightness — feeds back into the capture: rendering it
+        // changes the screen, which produces a frame, which updates the popover, and so on, so
+        // the loop never settles while it's open. Excluding our windows also keeps our own UI
+        // from skewing the luminance reading.
+        let myBundleID = Bundle.main.bundleIdentifier
+        let ownWindows = content.windows.filter {
+            $0.owningApplication?.bundleIdentifier == myBundleID
+        }
+        let filter = SCContentFilter(display: display, excludingWindows: ownWindows)
         let config = SCStreamConfiguration()
         config.width = 64
         config.height = 40
-        config.minimumFrameInterval = CMTime(value: 1, timescale: 60)
+        config.minimumFrameInterval = CMTime(value: 1, timescale: Self.captureFPS)
         config.queueDepth = 3
         config.pixelFormat = kCVPixelFormatType_32BGRA
         config.showsCursor = false
@@ -72,6 +90,7 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
                 of type: SCStreamOutputType) {
         guard type == .screen, sampleBuffer.isValid else { return }
 
+        // Forward only real content changes; ignore `.idle` (and any non-`.complete`) frames.
         guard let attachmentsArray = CMSampleBufferGetSampleAttachmentsArray(
                 sampleBuffer, createIfNecessary: false) as? [[SCStreamFrameInfo: Any]],
               let attachments = attachmentsArray.first,
@@ -82,9 +101,7 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
         }
 
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        let ciImage = CIImage(cvImageBuffer: pixelBuffer)
-        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
-        onFrame?(cgImage)
+        onFrame?(LuminanceCalculator.averageLuminance(of: pixelBuffer))
     }
 
     // MARK: - SCStreamDelegate

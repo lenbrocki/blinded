@@ -45,9 +45,10 @@ final class DisplayEngine {
     private var lastTick: CFTimeInterval = 0
 
     // Override / manual-edit state.
-    private var monitorTimer: Timer?
-    private var pendingOverride: Double?
+    private var monitorTimer: Timer?                 // fallback poll when notifications unavailable
+    private var pendingOverride: Double?             // used by the poll fallback
     private var pendingOverrideSince: CFTimeInterval = 0
+    private var overrideDebounce: DispatchWorkItem?  // notification path: settle before committing
     private var isUserEditing = false
 
     // Capture recovery.
@@ -80,8 +81,7 @@ final class DisplayEngine {
         stabilizer = LuminanceStabilizer()
         stabilizer.settleTime = settleTime
 
-        sampler.onFrame = { [weak self] image in
-            let lum = LuminanceCalculator.averageLuminance(of: image)
+        sampler.onFrame = { [weak self] lum in
             DispatchQueue.main.async { self?.ingest(luminance: lum) }
         }
         sampler.onError = { [weak self] error in
@@ -90,7 +90,11 @@ final class DisplayEngine {
         }
 
         if backend.supportsReadback {
-            startMonitor()
+            // Prefer event-driven brightness-change notifications; poll only if unavailable.
+            let observing = backend.observeBrightnessChanges { [weak self] in
+                self?.handleBrightnessChangeNotification()
+            }
+            if !observing { startMonitor() }
         }
 
         launchCapture()
@@ -100,9 +104,28 @@ final class DisplayEngine {
 
     /// Re-establishes capture after a sleep/wake or display reconfiguration. Resets the retry
     /// budget so a long-asleep display reconnects cleanly.
+    ///
+    /// Critically, it re-synchronizes our brightness belief with the hardware. During sleep/wake
+    /// macOS can change the actual brightness (wake fade-in, a restored level), leaving
+    /// `currentBrightness` stale. Without re-syncing, the override monitor reads the hardware,
+    /// sees it differ from our stale belief, and treats it as a *user* change — which parks
+    /// auto-adjust (`pendingOverride`) until the user manually nudges brightness. Re-reading here
+    /// keeps the override detector honest and lets auto-adjust resume immediately.
     func restartCapture() {
         guard isRunning else { start(); return }
         captureRetry = 0
+        pendingOverride = nil
+        overrideDebounce?.cancel(); overrideDebounce = nil
+        if backend.supportsReadback, let hw = backend.read() {
+            currentBrightness = hw
+            // Retarget to what the current (already-settled) content wants, so the loop ramps
+            // from the true hardware level to the content-appropriate brightness. If no content
+            // has settled yet, leave the target at the hardware level and let frames drive it.
+            targetBrightness = stabilizer.committed >= 0
+                ? model.brightness(forLuminance: stabilizer.committed)
+                : hw
+            ensureControlTimer() // guarantee the ramp runs even if no new frame arrives
+        }
         launchCapture()
     }
 
@@ -152,7 +175,9 @@ final class DisplayEngine {
         DispatchQueue.main.async { [weak self] in
             self?.controlTimer?.invalidate(); self?.controlTimer = nil
             self?.monitorTimer?.invalidate(); self?.monitorTimer = nil
+            self?.overrideDebounce?.cancel(); self?.overrideDebounce = nil
             self?.pendingOverride = nil
+            self?.backend.stopObservingBrightnessChanges()
         }
     }
 
@@ -224,7 +249,7 @@ final class DisplayEngine {
         }
 
         // Don't fight the user (key override in progress, or actively dragging the slider).
-        if pendingOverride == nil, !isUserEditing {
+        if !isUserAdjustingBrightness, !isUserEditing {
             let diff = targetBrightness - currentBrightness
             if abs(diff) > 0.0005 {
                 let step = rampPerSecond * dt
@@ -238,7 +263,7 @@ final class DisplayEngine {
 
         let luminanceSettled = abs(latestLuminance - stabilizer.committed) <= stabilizer.noiseBand
         let brightnessSettled = abs(targetBrightness - currentBrightness) <= 0.0005
-        if pendingOverride == nil, !isUserEditing, luminanceSettled, brightnessSettled {
+        if !isUserAdjustingBrightness, !isUserEditing, luminanceSettled, brightnessSettled {
             controlTimer?.invalidate()
             controlTimer = nil
         }
@@ -248,11 +273,35 @@ final class DisplayEngine {
         controlTimer != nil && abs(targetBrightness - currentBrightness) > 0.005
     }
 
+    /// True while the user is actively changing brightness (poll pending, or a notification
+    /// debounce in flight) — auto-adjust pauses so we don't fight them.
+    private var isUserAdjustingBrightness: Bool { pendingOverride != nil || overrideDebounce != nil }
+
     // MARK: - Override detection (built-in only)
+
+    /// Event-driven override detection. DisplayServices calls this (on the main thread) for
+    /// every hardware brightness change — including our own ramp writes, which the
+    /// `overrideThreshold` check in `commitBrightnessOverrideIfNeeded` filters out. We debounce
+    /// so a brightness key held down (which ramps in many small steps) commits a single override.
+    private func handleBrightnessChangeNotification() {
+        guard !isActivelyRamping, !isUserEditing else { return }
+        overrideDebounce?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.commitBrightnessOverrideIfNeeded() }
+        overrideDebounce = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + overrideSettleTime, execute: work)
+    }
+
+    private func commitBrightnessOverrideIfNeeded() {
+        overrideDebounce = nil
+        guard !isActivelyRamping, !isUserEditing, let hw = backend.read() else { return }
+        if abs(hw - currentBrightness) > overrideThreshold {
+            commitOverride(brightness: hw)
+        }
+    }
 
     private func startMonitor() {
         guard monitorTimer == nil else { return }
-        let timer = Timer(timeInterval: 0.25, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
             self?.monitorTick()
         }
         RunLoop.main.add(timer, forMode: .common)

@@ -33,6 +33,8 @@ final class AppState: ObservableObject {
     private var briByID: [CGDirectDisplayID: Double] = [:]
     private var correctionsByID: [CGDirectDisplayID: Int] = [:]
     private var flushScheduled = false
+    /// Whether the menu popover is currently open; UI flushes are skipped while it's closed.
+    private var popoverVisible = false
 
     // Watchdog: detect "enabled but never received a first frame" (capture blocked).
     private var receivedAnyFrame = false
@@ -123,8 +125,20 @@ final class AppState: ObservableObject {
 
     // MARK: - View-model mirroring
 
+    /// The menu popover re-renders its content whenever `displays` changes — even while it's
+    /// closed (MenuBarExtra keeps the content alive). So while it's closed we keep the latest
+    /// frame values in the dictionaries but skip the SwiftUI flush entirely; on open we do one
+    /// forced rebuild and then flush live. This is what keeps idle CPU near zero while content
+    /// is changing on screen (e.g. a blinking caret produces frames we'd otherwise render for).
+    func popoverAppeared() {
+        popoverVisible = true
+        rebuildDisplays(force: true)
+    }
+
+    func popoverDisappeared() { popoverVisible = false }
+
     private func scheduleFlush() {
-        guard !flushScheduled else { return }
+        guard popoverVisible, !flushScheduled else { return }
         flushScheduled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             self?.flushScheduled = false
@@ -132,7 +146,8 @@ final class AppState: ObservableObject {
         }
     }
 
-    private func rebuildDisplays() {
+    private func rebuildDisplays(force: Bool = false) {
+        guard force || popoverVisible else { return }
         displays = coordinator.displays.map { info in
             DisplayVM(id: info.displayID,
                       name: info.name,

@@ -10,6 +10,12 @@ protocol BrightnessBackend: AnyObject {
     var supportsReadback: Bool { get }
     func read() -> Double?
     func write(_ value: Double)
+
+    /// Subscribe to hardware brightness changes (event-driven; the handler runs on the main
+    /// thread). Returns false if change notifications aren't supported, in which case the
+    /// engine falls back to polling `read()`.
+    func observeBrightnessChanges(_ handler: @escaping () -> Void) -> Bool
+    func stopObservingBrightnessChanges()
 }
 
 /// Built-in panel via the private DisplayServices framework (wraps `BrightnessController`).
@@ -24,6 +30,11 @@ final class BuiltInBrightnessBackend: BrightnessBackend {
     var supportsReadback: Bool { true }
     func read() -> Double? { controller.getBrightness().map(Double.init) }
     func write(_ value: Double) { controller.setBrightness(Float(value)) }
+
+    func observeBrightnessChanges(_ handler: @escaping () -> Void) -> Bool {
+        controller.observeBrightnessChanges(handler)
+    }
+    func stopObservingBrightnessChanges() { controller.stopObservingBrightnessChanges() }
 }
 
 /// External monitor via DDC/CI (VCP `0x10` = luminance), using the vendored `Arm64DDC`.
@@ -61,4 +72,8 @@ final class DDCBrightnessBackend: BrightnessBackend {
         let raw = UInt16((Double(maxValue) * clamped).rounded())
         _ = Arm64DDC.write(service: service, command: 0x10, value: raw)
     }
+
+    // DDC monitors have no change-notification path; the engine relies on the in-app slider.
+    func observeBrightnessChanges(_ handler: @escaping () -> Void) -> Bool { false }
+    func stopObservingBrightnessChanges() {}
 }
