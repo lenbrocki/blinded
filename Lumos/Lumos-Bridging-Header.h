@@ -1,5 +1,5 @@
 //  Private-framework declarations needed for Apple-Silicon DDC/CI brightness control.
-//  Adapted from MonitorControl (MIT License) — see Blinded/Vendor/MonitorControl/NOTICE.md.
+//  Adapted from MonitorControl (MIT License) — see Lumos/Vendor/MonitorControl/NOTICE.md.
 
 #import <Foundation/Foundation.h>
 #import <IOKit/i2c/IOI2CInterface.h>

@@ -24,7 +24,7 @@ final class BrightnessController {
 
         let path = "/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices"
         guard let handle = dlopen(path, RTLD_NOW) else {
-            NSLog("Blinded: failed to dlopen DisplayServices: \(String(cString: dlerror()))")
+            NSLog("Lumos: failed to dlopen DisplayServices: \(String(cString: dlerror()))")
             setFunc = nil
             getFunc = nil
             registerFunc = nil
@@ -44,7 +44,7 @@ final class BrightnessController {
             unsafeBitCast($0, to: RegisterFunc.self)
         }
         if setFunc == nil {
-            NSLog("Blinded: DisplayServicesSetBrightness symbol not found")
+            NSLog("Lumos: DisplayServicesSetBrightness symbol not found")
         }
     }
 

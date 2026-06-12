@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5555555555555555555555E1"
-               BuildableName = "Blinded.app"
-               BlueprintName = "Blinded"
-               ReferencedContainer = "container:Blinded.xcodeproj">
+               BuildableName = "Lumos.app"
+               BlueprintName = "Lumos"
+               ReferencedContainer = "container:Lumos.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,9 +44,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5555555555555555555555E1"
-            BuildableName = "Blinded.app"
-            BlueprintName = "Blinded"
-            ReferencedContainer = "container:Blinded.xcodeproj">
+            BuildableName = "Lumos.app"
+            BlueprintName = "Lumos"
+            ReferencedContainer = "container:Lumos.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -61,9 +61,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5555555555555555555555E1"
-            BuildableName = "Blinded.app"
-            BlueprintName = "Blinded"
-            ReferencedContainer = "container:Blinded.xcodeproj">
+            BuildableName = "Lumos.app"
+            BlueprintName = "Lumos"
+            ReferencedContainer = "container:Lumos.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -98,7 +98,7 @@ extension AdaptiveBrightnessModel {
     private static func fileURL(key: String) -> URL {
         let dir = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Blinded", isDirectory: true)
+            .appendingPathComponent("Lumos", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let safe = key.replacingOccurrences(of: "/", with: "_")
         return dir.appendingPathComponent("curve-\(safe).json")

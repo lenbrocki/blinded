@@ -10,7 +10,7 @@ struct IgnoredApp: Codable, Equatable {
 }
 
 /// Persistent set of apps that pause content-adaptive brightness while frontmost, each holding
-/// a remembered per-display level. Inspired by lumen's ignore list, adapted to Blinded's
+/// a remembered per-display level. Inspired by lumen's ignore list, adapted to Lumos's
 /// multi-display model (lumen remembered a single level for the main display).
 ///
 /// Small structured config, so it lives in `UserDefaults` rather than the per-display curve files.

@@ -10,5 +10,5 @@ MIT License — Copyright © MonitorControl. @JoniVR, @theOneyouseek, @waydabber
 
 The private-framework symbols it relies on (`IOAVServiceCreateWithService`,
 `IOAVServiceReadI2C`, `IOAVServiceWriteI2C`, `CoreDisplay_DisplayCreateInfoDictionary`) are
-declared in `Blinded/Blinded-Bridging-Header.h`, also adapted from MonitorControl's bridging
+declared in `Lumos/Lumos-Bridging-Header.h`, also adapted from MonitorControl's bridging
 header.

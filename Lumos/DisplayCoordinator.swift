@@ -38,7 +38,7 @@ final class DisplayCoordinator {
     private var isRunning = false
     private var observing = false
 
-    /// Most recent frontmost app that isn't Blinded itself — the app the "pause" control acts on.
+    /// Most recent frontmost app that isn't Lumos itself — the app the "pause" control acts on.
     private(set) var lastActiveBundleID: String?
     private(set) var lastActiveAppName: String?
     /// The bundle ID currently gating brightness, when it's an ignored app (else nil).
@@ -76,7 +76,7 @@ final class DisplayCoordinator {
     var ignoredApps: [IgnoredApp] { ignoreStore.all }
     func isIgnored(_ bundleID: String) -> Bool { ignoreStore.isIgnored(bundleID) }
 
-    /// The app the "pause" control currently acts on (the last frontmost app that isn't Blinded).
+    /// The app the "pause" control currently acts on (the last frontmost app that isn't Lumos).
     var pausableApp: (bundleID: String, name: String)? {
         guard let id = lastActiveBundleID, let name = lastActiveAppName else { return nil }
         return (id, name)

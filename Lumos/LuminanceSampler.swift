@@ -26,7 +26,7 @@ final class LuminanceSampler: NSObject, SCStreamOutput, SCStreamDelegate {
     var onError: ((Error) -> Void)?
 
     private var stream: SCStream?
-    private let sampleQueue = DispatchQueue(label: "com.blinded.sampler", qos: .userInitiated)
+    private let sampleQueue = DispatchQueue(label: "com.lumos.sampler", qos: .userInitiated)
 
     /// The display this sampler captures. Defaults to the main display.
     private let targetDisplayID: CGDirectDisplayID

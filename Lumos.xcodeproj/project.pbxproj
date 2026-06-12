@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2222222222222222222222B1 /* BlindedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A1 /* BlindedApp.swift */; };
+		2222222222222222222222B1 /* LumosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A1 /* LumosApp.swift */; };
 		2222222222222222222222B2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A2 /* AppState.swift */; };
 		2222222222222222222222B3 /* DisplayEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A3 /* DisplayEngine.swift */; };
 		2222222222222222222222B4 /* LuminanceSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111A4 /* LuminanceSampler.swift */; };
@@ -24,7 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1111111111111111111111A1 /* BlindedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlindedApp.swift; sourceTree = "<group>"; };
+		1111111111111111111111A1 /* LumosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumosApp.swift; sourceTree = "<group>"; };
 		1111111111111111111111A2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		1111111111111111111111A3 /* DisplayEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayEngine.swift; sourceTree = "<group>"; };
 		1111111111111111111111A4 /* LuminanceSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuminanceSampler.swift; sourceTree = "<group>"; };
@@ -38,8 +38,8 @@
 		1111111111111111111111AC /* ExternalDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayManager.swift; sourceTree = "<group>"; };
 		1111111111111111111111AE /* DisplayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCoordinator.swift; sourceTree = "<group>"; };
 		1111111111111111111111AF /* IgnoredAppsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredAppsStore.swift; sourceTree = "<group>"; };
-		1111111111111111111111AD /* Blinded-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Blinded-Bridging-Header.h"; sourceTree = "<group>"; };
-		3333333333333333333333C1 /* Blinded.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinded.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1111111111111111111111AD /* Lumos-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lumos-Bridging-Header.h"; sourceTree = "<group>"; };
+		3333333333333333333333C1 /* Lumos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,15 +56,15 @@
 		4444444444444444444444D1 = {
 			isa = PBXGroup;
 			children = (
-				4444444444444444444444D2 /* Blinded */,
+				4444444444444444444444D2 /* Lumos */,
 				4444444444444444444444D3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		4444444444444444444444D2 /* Blinded */ = {
+		4444444444444444444444D2 /* Lumos */ = {
 			isa = PBXGroup;
 			children = (
-				1111111111111111111111A1 /* BlindedApp.swift */,
+				1111111111111111111111A1 /* LumosApp.swift */,
 				1111111111111111111111A2 /* AppState.swift */,
 				1111111111111111111111A3 /* DisplayEngine.swift */,
 				1111111111111111111111A4 /* LuminanceSampler.swift */,
@@ -78,15 +78,15 @@
 				1111111111111111111111AE /* DisplayCoordinator.swift */,
 				1111111111111111111111AF /* IgnoredAppsStore.swift */,
 				1111111111111111111111AA /* Arm64DDC.swift */,
-				1111111111111111111111AD /* Blinded-Bridging-Header.h */,
+				1111111111111111111111AD /* Lumos-Bridging-Header.h */,
 			);
-			path = Blinded;
+			path = Lumos;
 			sourceTree = "<group>";
 		};
 		4444444444444444444444D3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3333333333333333333333C1 /* Blinded.app */,
+				3333333333333333333333C1 /* Lumos.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -94,9 +94,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5555555555555555555555E1 /* Blinded */ = {
+		5555555555555555555555E1 /* Lumos */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Blinded" */;
+			buildConfigurationList = 8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Lumos" */;
 			buildPhases = (
 				6666666666666666666666F1 /* Sources */,
 				6666666666666666666666F2 /* Frameworks */,
@@ -106,9 +106,9 @@
 			);
 			dependencies = (
 			);
-			name = Blinded;
-			productName = Blinded;
-			productReference = 3333333333333333333333C1 /* Blinded.app */;
+			name = Lumos;
+			productName = Lumos;
+			productReference = 3333333333333333333333C1 /* Lumos.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +126,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8888888888888888888888A0 /* Build configuration list for PBXProject "Blinded" */;
+			buildConfigurationList = 8888888888888888888888A0 /* Build configuration list for PBXProject "Lumos" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -139,7 +139,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5555555555555555555555E1 /* Blinded */,
+				5555555555555555555555E1 /* Lumos */,
 			);
 		};
 /* End PBXProject section */
@@ -159,7 +159,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2222222222222222222222B1 /* BlindedApp.swift in Sources */,
+				2222222222222222222222B1 /* LumosApp.swift in Sources */,
 				2222222222222222222222B2 /* AppState.swift in Sources */,
 				2222222222222222222222B3 /* DisplayEngine.swift in Sources */,
 				2222222222222222222222B4 /* LuminanceSampler.swift in Sources */,
@@ -227,14 +227,14 @@
 				DEVELOPMENT_TEAM = 36WA9JF942;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Blinded;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumos;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MARKETING_VERSION = 0.1;
 				CURRENT_PROJECT_VERSION = 1;
-				SWIFT_OBJC_BRIDGING_HEADER = "Blinded/Blinded-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Lumos/Lumos-Bridging-Header.h";
 				OTHER_LDFLAGS = "-framework CoreDisplay";
-				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Blinded;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Lumos;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -252,14 +252,14 @@
 				DEVELOPMENT_TEAM = 36WA9JF942;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Blinded;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumos;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				MARKETING_VERSION = 0.1;
 				CURRENT_PROJECT_VERSION = 1;
-				SWIFT_OBJC_BRIDGING_HEADER = "Blinded/Blinded-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Lumos/Lumos-Bridging-Header.h";
 				OTHER_LDFLAGS = "-framework CoreDisplay";
-				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Blinded;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lennartbrocki.Lumos;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -270,7 +270,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8888888888888888888888A0 /* Build configuration list for PBXProject "Blinded" */ = {
+		8888888888888888888888A0 /* Build configuration list for PBXProject "Lumos" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9999999999999999999999A0 /* Debug */,
@@ -279,7 +279,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Blinded" */ = {
+		8888888888888888888888A1 /* Build configuration list for PBXNativeTarget "Lumos" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9999999999999999999999A2 /* Debug */,

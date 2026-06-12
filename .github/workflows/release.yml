@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${GITHUB_REF_NAME#v}"
-          xcodebuild -project Blinded.xcodeproj -scheme Blinded -configuration Release \
+          xcodebuild -project Lumos.xcodeproj -scheme Lumos -configuration Release \
             -derivedDataPath build \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
@@ -58,12 +58,12 @@ jobs:
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         run: |
           set -euo pipefail
-          APP="build/Build/Products/Release/Blinded.app"
-          ditto -c -k --keepParent "$APP" Blinded.zip
+          APP="build/Build/Products/Release/Lumos.app"
+          ditto -c -k --keepParent "$APP" Lumos.zip
 
           # Submit and capture the submission id (don't rely on --wait's exit code,
           # which is 0 even when the result is "Invalid").
-          SUBMIT_JSON="$(xcrun notarytool submit Blinded.zip \
+          SUBMIT_JSON="$(xcrun notarytool submit Lumos.zip \
             --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" \
             --wait --output-format json)"
           echo "$SUBMIT_JSON"
@@ -85,11 +85,11 @@ jobs:
       - name: Build DMG
         run: |
           set -euo pipefail
-          APP="build/Build/Products/Release/Blinded.app"
+          APP="build/Build/Products/Release/Lumos.app"
           STAGE="$(mktemp -d)"
           cp -R "$APP" "$STAGE/"
           ln -s /Applications "$STAGE/Applications"
-          hdiutil create -volname "Blinded" -srcfolder "$STAGE" -ov -format UDZO Blinded.dmg
+          hdiutil create -volname "Lumos" -srcfolder "$STAGE" -ov -format UDZO Lumos.dmg
 
       - name: Notarize the DMG
         env:
@@ -101,7 +101,7 @@ jobs:
 
           # The app inside is already notarized+stapled, so this submission is quick.
           # Notarizing+stapling the .dmg itself lets the download pass Gatekeeper directly.
-          SUBMIT_JSON="$(xcrun notarytool submit Blinded.dmg \
+          SUBMIT_JSON="$(xcrun notarytool submit Lumos.dmg \
             --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" \
             --wait --output-format json)"
           echo "$SUBMIT_JSON"
@@ -117,13 +117,13 @@ jobs:
             exit 1
           fi
 
-          xcrun stapler staple Blinded.dmg
+          xcrun stapler staple Lumos.dmg
 
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release create "$GITHUB_REF_NAME" Blinded.dmg \
+          gh release create "$GITHUB_REF_NAME" Lumos.dmg \
             --title "$GITHUB_REF_NAME" \
             --generate-notes

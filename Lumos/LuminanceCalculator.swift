@@ -12,7 +12,7 @@ import Foundation
 /// arithmetic mean isn't proportional to perceived brightness. We instead linearize each pixel,
 /// reduce it to relative luminance Y, and map Y to CIELAB **L\*** — a perceptually uniform
 /// lightness (0...100) where equal numeric steps look equally different to the eye. Averaging in
-/// L* space is what makes Blinded's "constant *perceived* brightness" goal honest. The standard
+/// L* space is what makes Lumos's "constant *perceived* brightness" goal honest. The standard
 /// sRGB→linear and Y→L* formulas are used (IEC 61966-2-1 / CIE 1976); L* is rescaled to 0...1.
 enum LuminanceCalculator {
     /// sRGB gamma decode (byte 0...255 → linear 0...1), precomputed once to keep the per-pixel

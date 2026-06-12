@@ -2,11 +2,11 @@ import AppKit
 import SwiftUI
 
 @main
-struct BlindedApp: App {
+struct LumosApp: App {
     @StateObject private var state = AppState()
 
     var body: some Scene {
-        MenuBarExtra("Blinded", systemImage: state.isEnabled ? "sun.max.fill" : "sun.max") {
+        MenuBarExtra("Lumos", systemImage: state.isEnabled ? "sun.max.fill" : "sun.max") {
             ContentView(state: state)
         }
         .menuBarExtraStyle(.window)
@@ -51,7 +51,7 @@ struct ContentView: View {
             }
 
             Divider()
-            Button("Quit Blinded") { NSApplication.shared.terminate(nil) }
+            Button("Quit Lumos") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
         }
         .padding(14)
@@ -68,7 +68,7 @@ struct ContentView: View {
                   systemImage: "lock")
                 .foregroundStyle(.orange)
             if state.captureBlocked {
-                Text("macOS may have revoked it. Enable Blinded under Screen Recording, then toggle Auto-brightness off and on.")
+                Text("macOS may have revoked it. Enable Lumos under Screen Recording, then toggle Auto-brightness off and on.")
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Button("Open Screen Recording settings…") { state.openScreenRecordingSettings() }
