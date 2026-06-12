@@ -41,6 +41,9 @@ struct ContentView: View {
                         DisplayRow(state: state, display: display)
                     }
                 }
+
+                Divider()
+                PauseSection(state: state)
             }
 
             if let error = state.lastErrorMessage {
@@ -72,6 +75,50 @@ struct ContentView: View {
         }
     }
 
+}
+
+/// Per-app pause (ignore list): turn auto-brightness off for the current app, and manage the
+/// list of paused apps. A paused app holds whatever brightness you last set while in it.
+struct PauseSection: View {
+    @ObservedObject var state: AppState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Pause for an app").font(.caption).foregroundStyle(.secondary)
+
+            if let app = state.currentApp {
+                Toggle(isOn: Binding(
+                    get: { app.isIgnored },
+                    set: { _ in state.togglePauseForCurrentApp() }
+                )) {
+                    Text(app.name).lineLimit(1)
+                }
+                .toggleStyle(.switch)
+                .help("Hold a fixed brightness while \(app.name) is frontmost")
+            } else {
+                Text("Switch to another app to pause it here.")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+
+            // Other paused apps (the current one is already shown above with its toggle).
+            ForEach(state.ignoredApps.filter { $0.id != state.currentApp?.bundleID }) { app in
+                HStack(spacing: 6) {
+                    Image(systemName: "pause.circle").foregroundStyle(.secondary)
+                    Text(app.name).lineLimit(1)
+                    Spacer()
+                    Button {
+                        state.removeIgnoredApp(app.id)
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.secondary)
+                    .help("Resume auto-brightness for \(app.name)")
+                }
+                .font(.caption)
+            }
+        }
+    }
 }
 
 struct DisplayRow: View {

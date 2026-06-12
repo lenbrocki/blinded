@@ -30,6 +30,9 @@ final class DisplayEngine {
     var onUpdate: ((Double, Double) -> Void)?
     var onError: ((Error) -> Void)?
     var onLearn: (() -> Void)?
+    /// Called when the user changes brightness while paused for an ignored app, so the
+    /// coordinator can persist it as that app's remembered level for this display.
+    var onIgnoredBrightnessSet: ((Double) -> Void)?
 
     private let sampler: LuminanceSampler
     private let backend: BrightnessBackend
@@ -50,6 +53,12 @@ final class DisplayEngine {
     private var pendingOverrideSince: CFTimeInterval = 0
     private var overrideDebounce: DispatchWorkItem?  // notification path: settle before committing
     private var isUserEditing = false
+
+    // Per-app pause (ignore list). While `ignoredMode` is on, content-adaptive adjustment is
+    // suspended and the display holds the app's remembered level; manual changes update that
+    // remembered level instead of the learning curve.
+    private var ignoredMode = false
+    private var ignoredPreferred: Double?
 
     // Capture recovery.
     private var isLaunching = false
@@ -187,6 +196,42 @@ final class DisplayEngine {
         onLearn?()
     }
 
+    // MARK: - Per-app pause (ignore list)
+
+    /// Enters or leaves "paused" mode for the frontmost app. When paused, auto-adjust stops and
+    /// the display ramps to `preferredBrightness` (the app's remembered level), if known;
+    /// otherwise it simply holds where it is until the user picks a level. Leaving paused mode
+    /// resumes adaptation from the current content.
+    func setIgnored(_ ignored: Bool, preferredBrightness: Double?) {
+        if ignored {
+            ignoredPreferred = preferredBrightness
+            if let pref = preferredBrightness {
+                ignoredMode = true
+                targetBrightness = max(0, min(1, pref))
+                rampPerSecond = gentleRampPerSecond
+                ensureControlTimer()
+            } else if !ignoredMode {
+                // No remembered level yet — stop adapting and hold the current brightness.
+                ignoredMode = true
+                targetBrightness = currentBrightness
+            } else {
+                ignoredMode = true
+            }
+        } else {
+            guard ignoredMode else { return }
+            ignoredMode = false
+            ignoredPreferred = nil
+            // Resume auto-adjust: retarget to what the current content wants and ramp there.
+            let newTarget = model.brightness(forLuminance: max(0, min(1, latestLuminance)))
+            let delta = newTarget - currentBrightness
+            rampPerSecond = abs(delta) >= jumpThreshold
+                ? (delta < 0 ? dimRampPerSecond : fastRampPerSecond)
+                : gentleRampPerSecond
+            targetBrightness = newTarget
+            ensureControlTimer()
+        }
+    }
+
     // MARK: - Manual correction (slider)
 
     /// Live preview while dragging: apply immediately and pause auto-adjust, without learning yet.
@@ -205,11 +250,18 @@ final class DisplayEngine {
         currentBrightness = v
         targetBrightness = v
         backend.write(v)
-        model.reinforce(luminance: stabilizer.committed, brightness: v)
-        model.save(key: info.persistKey)
         isUserEditing = false
-        onUpdate?(latestLuminance, v)
-        onLearn?()
+        if ignoredMode {
+            // Paused for an app: remember this as the app's preferred level, don't reshape the curve.
+            ignoredPreferred = v
+            onUpdate?(latestLuminance, v)
+            onIgnoredBrightnessSet?(v)
+        } else {
+            model.reinforce(luminance: stabilizer.committed, brightness: v)
+            model.save(key: info.persistKey)
+            onUpdate?(latestLuminance, v)
+            onLearn?()
+        }
     }
 
     // MARK: - Control loop (main thread)
@@ -235,7 +287,10 @@ final class DisplayEngine {
         let dt = max(0, now - lastTick)
         lastTick = now
 
-        if stabilizer.update(luminance: latestLuminance, now: now) {
+        // Keep advancing the stabilizer so `committed` stays fresh for when we resume, but only
+        // retarget from content while not paused for an ignored app.
+        let settled = stabilizer.update(luminance: latestLuminance, now: now)
+        if settled, !ignoredMode {
             let newTarget = model.brightness(forLuminance: stabilizer.committed)
             let delta = newTarget - currentBrightness
             if abs(delta) >= jumpThreshold {
@@ -261,9 +316,12 @@ final class DisplayEngine {
         }
         onUpdate?(latestLuminance, currentBrightness)
 
+        // While paused, brightness is decoupled from content, so the timer can stop as soon as
+        // the backlight has settled — even if the (ignored) content keeps changing.
         let luminanceSettled = abs(latestLuminance - stabilizer.committed) <= stabilizer.noiseBand
         let brightnessSettled = abs(targetBrightness - currentBrightness) <= 0.0005
-        if !isUserAdjustingBrightness, !isUserEditing, luminanceSettled, brightnessSettled {
+        let canStop = brightnessSettled && (ignoredMode || luminanceSettled)
+        if !isUserAdjustingBrightness, !isUserEditing, canStop {
             controlTimer?.invalidate()
             controlTimer = nil
         }
@@ -330,9 +388,16 @@ final class DisplayEngine {
         pendingOverride = nil
         currentBrightness = hw
         targetBrightness = hw
-        model.reinforce(luminance: stabilizer.committed, brightness: hw)
-        model.save(key: info.persistKey)
-        onUpdate?(latestLuminance, currentBrightness)
-        onLearn?()
+        if ignoredMode {
+            // Paused for an app: remember this level for the app, don't reshape the curve.
+            ignoredPreferred = hw
+            onUpdate?(latestLuminance, currentBrightness)
+            onIgnoredBrightnessSet?(hw)
+        } else {
+            model.reinforce(luminance: stabilizer.committed, brightness: hw)
+            model.save(key: info.persistKey)
+            onUpdate?(latestLuminance, currentBrightness)
+            onLearn?()
+        }
     }
 }

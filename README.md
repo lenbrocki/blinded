@@ -22,12 +22,11 @@ display *and* every external monitor.
 - **🧠 Learns your preference** — whenever you adjust brightness yourself, Blinded records what
   you wanted for that kind of content and adapts its curve. The more you use it, the more it
   feels like yours.
+- **⏸️ Pause for any app** — mark apps (a video player, a photo editor, a game) to hold a fixed
+  brightness instead of adapting. Blinded remembers the level you picked for each one, per display.
 - **🖥️ Built-in *and* external monitors** — controls your MacBook panel and external displays
   over DDC/CI, each adapted to its own content and with its own learned memory. Plug or unplug a
   monitor and it adjusts automatically.
-- **⚡ Instant and quiet** — reacts the moment your content changes, and uses ~no CPU when the
-  screen is still.
-- **🪶 Out of the way** — a single menu-bar icon, no Dock clutter, no window to manage.
 - **🔒 Private** — everything happens locally on your Mac; nothing is sent anywhere.
 
 ## Install
@@ -62,6 +61,15 @@ display's curve so similar content lands where you like it next time. Correction
 tuning bright pages doesn't affect how dark ones behave. Each display remembers separately, and
 its memory survives reconnects. A per-display reset button restores the default curve.
 
+## Pausing for an app
+
+Some apps shouldn't be touched — a fullscreen movie where the backlight shouldn't chase the
+scene, a photo or video editor where you're judging the image, a game. Open the menu and flip
+**Pause for &lt;app&gt;** while that app is frontmost. From then on, whenever it's in front Blinded
+stops adapting and holds a fixed brightness; whatever level you set while in that app (slider or
+brightness keys) becomes its remembered level, **per display**. Paused apps are listed in the menu
+with a button to resume auto-brightness.
+
 ## How it works (in plain terms)
 
 Blinded takes a tiny, low-resolution snapshot of each screen *only when its content changes*,
@@ -78,8 +86,10 @@ screen costs essentially nothing.
   [`DisplayEngine`](Blinded/DisplayEngine.swift)).
 - **Sensing** — an event-driven [ScreenCaptureKit](https://developer.apple.com/documentation/screencapturekit)
   stream downscaled to ~64×40 px. It's push-based (frames arrive only on content change), so
-  reactions are near-instant and an idle screen is ~0 CPU. Average perceptual luminance is
-  computed per frame.
+  reactions are near-instant and an idle screen is ~0 CPU. Each frame is reduced to its average
+  **perceptual lightness** (CIE L\*) — pixels are linearized from sRGB and mapped to a
+  perceptually uniform scale, so the reading tracks perceived brightness rather than raw bytes
+  ([`LuminanceCalculator`](Blinded/LuminanceCalculator.swift)).
 - **Learnable mapping** — an [`AdaptiveBrightnessModel`](Blinded/AdaptiveBrightnessModel.swift)
   of interpolated control points across the luminance range. It cold-starts from a fixed curve
   and is reshaped by corrections via a local, distance-weighted update that keeps the curve
@@ -144,6 +154,10 @@ One-time repo **secrets** (Settings → Secrets and variables → Actions):
   backlight and the measurement.
 
 ## Credits & license
+
+Blinded was inspired by [lumen](https://github.com/anishathalye/lumen).
+Unlike lumen, Blinded fully supports external monitors out of the box, controlling them over
+DDC/CI with their own content-adapted, learnable brightness curves.
 
 Blinded is released under the [MIT License](LICENSE). DDC/CI control on Apple Silicon
 ([`Arm64DDC.swift`](Blinded/Vendor/MonitorControl/Arm64DDC.swift)) is vendored from

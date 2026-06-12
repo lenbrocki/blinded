@@ -16,8 +16,21 @@ final class AppState: ObservableObject {
         var corrections: Int
     }
 
+    struct IgnoredAppVM: Identifiable {
+        let id: String   // bundle ID
+        let name: String
+    }
+    /// The frontmost app the "pause" control acts on, and whether it's currently paused.
+    struct CurrentAppVM {
+        let bundleID: String
+        let name: String
+        let isIgnored: Bool
+    }
+
     @Published var isEnabled = false
     @Published var displays: [DisplayVM] = []
+    @Published var ignoredApps: [IgnoredAppVM] = []
+    @Published var currentApp: CurrentAppVM?
     @Published var hasScreenPermission = false
     @Published var lastErrorMessage: String?
     /// True when enabled but no screen frames are arriving — almost always a blocked/revoked
@@ -61,6 +74,7 @@ final class AppState: ObservableObject {
         coordinator.onError = { [weak self] error in
             self?.lastErrorMessage = error.localizedDescription
         }
+        coordinator.onIgnoreStateChanged = { [weak self] in self?.refreshIgnoreState() }
     }
 
     func setEnabled(_ on: Bool) {
@@ -80,8 +94,33 @@ final class AppState: ObservableObject {
             captureBlocked = false
             lumByID.removeAll(); briByID.removeAll()
             displays = []
+            ignoredApps = []
+            currentApp = nil
         }
         isEnabled = on
+    }
+
+    // MARK: - Per-app pause (ignore list)
+
+    /// Toggles whether the current frontmost app pauses auto-brightness.
+    func togglePauseForCurrentApp() {
+        guard let app = currentApp else { return }
+        coordinator.toggleIgnore(bundleID: app.bundleID, name: app.name)
+    }
+
+    func removeIgnoredApp(_ bundleID: String) {
+        coordinator.removeIgnored(bundleID: bundleID)
+    }
+
+    private func refreshIgnoreState(force: Bool = false) {
+        guard force || popoverVisible else { return }
+        ignoredApps = coordinator.ignoredApps.map { IgnoredAppVM(id: $0.bundleID, name: $0.name) }
+        if let app = coordinator.pausableApp {
+            currentApp = CurrentAppVM(bundleID: app.bundleID, name: app.name,
+                                      isIgnored: coordinator.isIgnored(app.bundleID))
+        } else {
+            currentApp = nil
+        }
     }
 
     /// If no frame arrives within a few seconds of enabling, capture is blocked (permission).
@@ -133,6 +172,7 @@ final class AppState: ObservableObject {
     func popoverAppeared() {
         popoverVisible = true
         rebuildDisplays(force: true)
+        refreshIgnoreState(force: true)
     }
 
     func popoverDisappeared() { popoverVisible = false }

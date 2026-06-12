@@ -20,6 +20,7 @@
 		2222222222222222222222BB /* BrightnessBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AB /* BrightnessBackend.swift */; };
 		2222222222222222222222BC /* ExternalDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AC /* ExternalDisplayManager.swift */; };
 		2222222222222222222222BD /* DisplayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AE /* DisplayCoordinator.swift */; };
+		2222222222222222222222BE /* IgnoredAppsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AF /* IgnoredAppsStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		1111111111111111111111AB /* BrightnessBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessBackend.swift; sourceTree = "<group>"; };
 		1111111111111111111111AC /* ExternalDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayManager.swift; sourceTree = "<group>"; };
 		1111111111111111111111AE /* DisplayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCoordinator.swift; sourceTree = "<group>"; };
+		1111111111111111111111AF /* IgnoredAppsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredAppsStore.swift; sourceTree = "<group>"; };
 		1111111111111111111111AD /* Blinded-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Blinded-Bridging-Header.h"; sourceTree = "<group>"; };
 		3333333333333333333333C1 /* Blinded.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinded.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -74,6 +76,7 @@
 				1111111111111111111111AB /* BrightnessBackend.swift */,
 				1111111111111111111111AC /* ExternalDisplayManager.swift */,
 				1111111111111111111111AE /* DisplayCoordinator.swift */,
+				1111111111111111111111AF /* IgnoredAppsStore.swift */,
 				1111111111111111111111AA /* Arm64DDC.swift */,
 				1111111111111111111111AD /* Blinded-Bridging-Header.h */,
 			);
@@ -169,6 +172,7 @@
 				2222222222222222222222BB /* BrightnessBackend.swift in Sources */,
 				2222222222222222222222BC /* ExternalDisplayManager.swift in Sources */,
 				2222222222222222222222BD /* DisplayCoordinator.swift in Sources */,
+				2222222222222222222222BE /* IgnoredAppsStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
