@@ -11,6 +11,10 @@ display *and* every external monitor.
 
 **Apple Silicon · macOS 14+ · lives in the menu bar**
 
+<br>
+
+<img src="assets/lumos_readme.gif" alt="Lumos adapting screen brightness to on-screen content" width="720">
+
 </div>
 
 ---
