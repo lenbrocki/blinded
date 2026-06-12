@@ -15,7 +15,7 @@ jobs:
   release:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Import Developer ID signing certificate
         env:
@@ -90,6 +90,34 @@ jobs:
           cp -R "$APP" "$STAGE/"
           ln -s /Applications "$STAGE/Applications"
           hdiutil create -volname "Blinded" -srcfolder "$STAGE" -ov -format UDZO Blinded.dmg
+
+      - name: Notarize the DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          # The app inside is already notarized+stapled, so this submission is quick.
+          # Notarizing+stapling the .dmg itself lets the download pass Gatekeeper directly.
+          SUBMIT_JSON="$(xcrun notarytool submit Blinded.dmg \
+            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+            --wait --output-format json)"
+          echo "$SUBMIT_JSON"
+          SUBMISSION_ID="$(echo "$SUBMIT_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin)["id"])')"
+          STATUS="$(echo "$SUBMIT_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin)["status"])')"
+
+          echo "--- notarization log ($SUBMISSION_ID) ---"
+          xcrun notarytool log "$SUBMISSION_ID" \
+            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" || true
+
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "::error::DMG notarization failed with status: $STATUS"
+            exit 1
+          fi
+
+          xcrun stapler staple Blinded.dmg
 
       - name: Publish GitHub Release
         env:
