@@ -21,6 +21,7 @@
 		2222222222222222222222BC /* ExternalDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AC /* ExternalDisplayManager.swift */; };
 		2222222222222222222222BD /* DisplayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AE /* DisplayCoordinator.swift */; };
 		2222222222222222222222BE /* IgnoredAppsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111AF /* IgnoredAppsStore.swift */; };
+		2222222222222222222222BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1111111111111111111111B0 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		1111111111111111111111AE /* DisplayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCoordinator.swift; sourceTree = "<group>"; };
 		1111111111111111111111AF /* IgnoredAppsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredAppsStore.swift; sourceTree = "<group>"; };
 		1111111111111111111111AD /* Lumos-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Lumos-Bridging-Header.h"; sourceTree = "<group>"; };
+		1111111111111111111111B0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3333333333333333333333C1 /* Lumos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lumos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -79,6 +81,7 @@
 				1111111111111111111111AF /* IgnoredAppsStore.swift */,
 				1111111111111111111111AA /* Arm64DDC.swift */,
 				1111111111111111111111AD /* Lumos-Bridging-Header.h */,
+				1111111111111111111111B0 /* Assets.xcassets */,
 			);
 			path = Lumos;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2222222222222222222222BF /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +224,7 @@
 		9999999999999999999999A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
@@ -245,6 +250,7 @@
 		9999999999999999999999A3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;

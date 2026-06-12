@@ -89,6 +89,13 @@ jobs:
           STAGE="$(mktemp -d)"
           cp -R "$APP" "$STAGE/"
           ln -s /Applications "$STAGE/Applications"
+
+          # Brand the mounted volume with the app icon, if one is committed.
+          if [ -f Lumos/Lumos.icns ]; then
+            cp Lumos/Lumos.icns "$STAGE/.VolumeIcon.icns"
+            SetFile -a C "$STAGE" 2>/dev/null || true
+          fi
+
           hdiutil create -volname "Lumos" -srcfolder "$STAGE" -ov -format UDZO Lumos.dmg
 
       - name: Notarize the DMG
