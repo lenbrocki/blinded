@@ -46,6 +46,7 @@ jobs:
             DEVELOPMENT_TEAM="$TEAM_ID" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             ENABLE_HARDENED_RUNTIME=YES \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             OTHER_CODE_SIGN_FLAGS="--timestamp --options runtime" \
             MARKETING_VERSION="$VERSION" \
             clean build
@@ -59,8 +60,26 @@ jobs:
           set -euo pipefail
           APP="build/Build/Products/Release/Blinded.app"
           ditto -c -k --keepParent "$APP" Blinded.zip
-          xcrun notarytool submit Blinded.zip \
-            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+
+          # Submit and capture the submission id (don't rely on --wait's exit code,
+          # which is 0 even when the result is "Invalid").
+          SUBMIT_JSON="$(xcrun notarytool submit Blinded.zip \
+            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+            --wait --output-format json)"
+          echo "$SUBMIT_JSON"
+          SUBMISSION_ID="$(echo "$SUBMIT_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin)["id"])')"
+          STATUS="$(echo "$SUBMIT_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin)["status"])')"
+
+          # Always print the detailed notary log so rejections are diagnosable.
+          echo "--- notarization log ($SUBMISSION_ID) ---"
+          xcrun notarytool log "$SUBMISSION_ID" \
+            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_APP_PASSWORD" || true
+
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "::error::Notarization failed with status: $STATUS"
+            exit 1
+          fi
+
           xcrun stapler staple "$APP"
 
       - name: Build DMG
