@@ -35,6 +35,17 @@ display *and* every external monitor.
 
 ## Install
 
+### Homebrew
+
+```sh
+brew install --cask lenbrocki/tap/lumos
+```
+
+Then launch Lumos — a sun icon appears in your menu bar. Update later with
+`brew upgrade --cask lumos`.
+
+### Manual
+
 1. Download **`Lumos.dmg`** from the [latest release](../../releases/latest).
 2. Open it and drag **Lumos** into **Applications**.
 3. Launch Lumos — a sun icon appears in your menu bar.
