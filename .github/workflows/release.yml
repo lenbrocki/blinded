@@ -134,3 +134,34 @@ jobs:
           gh release create "$GITHUB_REF_NAME" Lumos.dmg \
             --title "$GITHUB_REF_NAME" \
             --generate-notes
+
+      # Bump the cask in lenbrocki/homebrew-tap so `brew upgrade --cask lumos`
+      # picks up the new release. Requires a repo secret HOMEBREW_TAP_TOKEN: a
+      # PAT (fine-grained, Contents: read/write on lenbrocki/homebrew-tap, or a
+      # classic token with `repo` scope). Skipped automatically if unset.
+      - name: Update Homebrew tap
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HOMEBREW_TAP_TOKEN:-}" ]; then
+            echo "HOMEBREW_TAP_TOKEN not set; skipping Homebrew tap update."
+            exit 0
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          SHA="$(shasum -a 256 Lumos.dmg | awk '{print $1}')"
+          git clone --depth 1 \
+            "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/lenbrocki/homebrew-tap.git" tap
+          CASK="tap/Casks/lumos.rb"
+          sed -i '' -E "s/^  version \".*\"/  version \"${VERSION}\"/" "$CASK"
+          sed -i '' -E "s/^  sha256 \".*\"/  sha256 \"${SHA}\"/" "$CASK"
+          cd tap
+          if git diff --quiet; then
+            echo "Cask already up to date; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/lumos.rb
+          git commit -m "Update Lumos to ${VERSION}"
+          git push
