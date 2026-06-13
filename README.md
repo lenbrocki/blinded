@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/lumos_icon.png" alt="Lumos app icon" width="128" height="128">
+
 # Lumos
 
 ### Adaptive screen brightness for macOS that follows your content — and learns from you.
